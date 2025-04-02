@@ -13,10 +13,21 @@ alias wrapoff='tput smam'
 alias wrapon='tput rmam'
 alias tree='tree --gitignore'
 
-# Directory Listing (using ls as per .zshrc)
-alias l='ls -l'
-alias la='ls -la'
-alias ll='ls -l'
+# Directory Listing with exa if available
+if command -v exa &>/dev/null; then
+  alias ls='exa'                                                         # ls
+  alias l='exa -l --icons --git'                                         # long list
+  alias la='exa -la --icons --git'                                       # long list with hidden files
+  alias ll='exa -l --icons --git'                                        # long list
+  alias lt='exa -T --icons --git-ignore'                                 # tree listing
+  alias lta='exa -Ta --icons --git-ignore'                               # tree listing including hidden files
+  alias lg='exa -l --icons --git --git-ignore --group-directories-first' # long list with directories first
+else
+  # Fallback to standard ls with colors
+  alias l='ls -l'
+  alias la='ls -la'
+  alias ll='ls -l'
+fi
 
 # Git
 alias g='git'
