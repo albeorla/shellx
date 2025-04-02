@@ -56,6 +56,7 @@ alias reset_shellx='~/.shellx/reset_shellx_setup.sh'
 alias gen_comps='~/.shellx/generate_completions.sh'
 alias gen_rc='~/.shellx/generate_rc_sourcing.sh'
 alias antigen_clean='~/.shellx/clean_install_antigen.sh'
+alias shellx='shellx_help'
 
 # Python virtual environment
 alias venv='silent_activate'

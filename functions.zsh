@@ -130,11 +130,6 @@ shellx_help() {
   fi
 }
 
-# Shorthand alias function for shellx_help
-shellx() {
-  shellx_help "$@"
-}
-
 # Activate Python virtual environment without triggering Powerlevel10k warnings
 silent_activate() {
   local venv_path="${1:-".venv"}"
