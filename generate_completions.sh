@@ -25,55 +25,54 @@ echo "" >> "$temporary_file"
 # --- Process Aliases ---
 echo "# Completions for Aliases" >> "$temporary_file"
 if [[ -f "$alias_file" ]]; then
-    # Extract just the alias name and not the full definition
-    grep -E '^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+=' "$alias_file" | sed -E 's/^\s*alias\s+//' | cut -d'=' -f1 | while IFS= read -r alias_name; do
-        # Map specific aliases to specific completions when known
+    # Handle standard aliases without conditionals
+    grep -E "^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+=" "$alias_file" | 
+    grep -v "if command" | # Skip conditional blocks
+    while IFS= read -r line; do
+        # Extract alias name
+        local alias_name=$(echo "$line" | sed -E 's/^\s*alias\s+([a-zA-Z0-9_-]+)=.*/\1/')
+        
+        # Map completions based on the alias name
         case "$alias_name" in
-            pathx)
-                echo "compdef _default alias $alias_name" >> "$temporary_file"
+            # VIM-related
+            envc|gconf) 
+                echo "compdef _vim $alias_name" >> "$temporary_file" ;;
+            # Source-related
+            envr)
+                echo "compdef _source $alias_name" >> "$temporary_file" ;;
+            # Directory commands
+            ls|l|la|ll|lt|lta|lg)
+                if command -v exa &>/dev/null; then
+                    echo "compdef _exa $alias_name" >> "$temporary_file"
+                else
+                    echo "compdef _ls $alias_name" >> "$temporary_file"
+                fi
                 ;;
-            python)
-                echo "compdef _python3 alias $alias_name" >> "$temporary_file"
-                ;;
-            grep)
-                echo "compdef _grep alias $alias_name" >> "$temporary_file"
-                ;;
+            # Git commands
             g|gs|gignore|gwip|grbi|grba|grbc|grbir)
-                echo "compdef _git alias $alias_name" >> "$temporary_file"
-                ;;
-            l|la|ll)
-                echo "compdef _ls alias $alias_name" >> "$temporary_file"
-                ;;
-            tarc|tarx)
-                echo "compdef _tar alias $alias_name" >> "$temporary_file"
-                ;;
-            hidefiles|showfiles)
-                echo "compdef _defaults alias $alias_name" >> "$temporary_file"
-                ;;
-            envc|gconf)
-                echo "compdef _vim alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _git $alias_name" >> "$temporary_file" ;;
+            # Basic utils
+            grep)
+                echo "compdef _grep $alias_name" >> "$temporary_file" ;;
             mkdir)
-                echo "compdef _mkdir alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _mkdir $alias_name" >> "$temporary_file" ;;
+            python)
+                echo "compdef _python3 $alias_name" >> "$temporary_file" ;;
             utime)
-                echo "compdef _date alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _date $alias_name" >> "$temporary_file" ;;
             wrapoff|wrapon)
-                echo "compdef _tput alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _tput $alias_name" >> "$temporary_file" ;;
             tree)
-                echo "compdef _tree alias $alias_name" >> "$temporary_file"
-                ;;
-            yts)
-                echo "compdef _yt-dlp alias $alias_name" >> "$temporary_file"
-                ;;
-            venv)
-                echo "compdef _default alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _tree $alias_name" >> "$temporary_file" ;;
+            # MacOS
+            hidefiles|showfiles)
+                echo "compdef _defaults $alias_name" >> "$temporary_file" ;;
+            # Archiving
+            tarc|tarx)
+                echo "compdef _tar $alias_name" >> "$temporary_file" ;;
+            # Default for all others
             *)
-                echo "compdef _default alias $alias_name" >> "$temporary_file"
-                ;;
+                echo "compdef _default $alias_name" >> "$temporary_file" ;;
         esac
     done
 fi
@@ -87,7 +86,7 @@ if [[ -f "$func_file" ]]; then
     sed -E 's/^\s*function\s+//; s/\(\)\s*\{//; s/\s*\{//' |
     while IFS= read -r func_name; do
         if [[ -n "$func_name" ]]; then
-            # Remove trailing () if present (don't include parentheses in compdef)
+            # Remove trailing () if present
             local clean_func_name=$(echo "$func_name" | sed 's/()$//')
             # Use _default completion for functions unless specific logic is added
             echo "compdef _default $clean_func_name" >> "$temporary_file"
