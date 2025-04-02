@@ -103,15 +103,17 @@ shellx_help() {
   echo "                 Run this if you add/remove/modify aliases or functions."
   echo "                 (Runs: ~/.shellx/generate_completions.sh)"
   echo ""
-  echo "  shellx_help  : Displays this help message."
+  echo "  shellx       : Displays this help message (alias for shellx_help)."
   echo ""
   echo "See ~/.shellx/README.md for more details on the structure."
 
   # --- List Custom Aliases --- 
   if [[ -f "$alias_file" ]]; then
     echo "\nCustom Aliases (from ${alias_file##*/}):\n"
-    # Simply list alias names without trying to parse them
-    grep -E "^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+=" "$alias_file" | sed -E 's/^[[:space:]]*alias[[:space:]]+([a-zA-Z0-9_-]+)=.*/  \1/'
+    # Extract alias names and remove duplicates
+    grep -E "^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+=" "$alias_file" | 
+      sed -E 's/^[[:space:]]*alias[[:space:]]+([a-zA-Z0-9_-]+)=.*/  \1/' | 
+      sort | uniq
   else
     echo "\nAlias file not found: ${alias_file}" >&2
   fi
@@ -120,10 +122,17 @@ shellx_help() {
   if [[ -f "$func_file" ]]; then
     echo "\nCustom Functions (from ${func_file##*/}):\n"
     # Simply grep for function definitions and extract names  
-    grep -E "^[a-zA-Z0-9_-]+\\(\\)" "$func_file" | sed -E "s/^([a-zA-Z0-9_-]+).*/  \\1/"
+    grep -E "^[a-zA-Z0-9_-]+\\(\\)" "$func_file" | 
+      sed -E "s/^([a-zA-Z0-9_-]+).*/  \\1/" | 
+      sort
   else
     echo "\nFunction file not found: ${func_file}" >&2
   fi
+}
+
+# Shorthand alias function for shellx_help
+shellx() {
+  shellx_help "$@"
 }
 
 # Activate Python virtual environment without triggering Powerlevel10k warnings
