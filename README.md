@@ -19,7 +19,9 @@ This directory contains the modular configuration files for the Zsh environment.
     file minimal and fast.
 *   **`99_shutdown.zsh`**: Contains commands that should run at the very end of the
     Zsh setup process.
-*   **`p10k.zsh`**: Sources the Powerlevel10k configuration file from home directory if needed.
+*   **`p10k_loader.zsh`**: Loader that sources the Powerlevel10k configuration file from `configs/p10k.zsh`.
+*   **`configs/p10k.zsh`**: Contains the actual Powerlevel10k configuration with custom
+    settings for a minimal, clean prompt.
 
 ## Management Commands
 
@@ -72,13 +74,21 @@ is determined by `generate_rc_sourcing.sh`.
 *   `settings.zsh`: Core Zsh options (`setopt`), history settings, navigation aliases,
     and `compinit` (completion system initialization).
 *   `functions.zsh`: Custom shell functions and the `shellx_help` function.
+    Also includes `silent_activate` for Python virtual environments.
 *   `aliases.zsh`: Custom shell aliases and management command aliases.
 *   `antigen.zsh`: Zsh plugin manager (Antigen) setup.
-*   `direnv.zsh`: Direnv hook setup.
+*   `direnv.zsh`: Direnv hook setup with silenced output to prevent prompt issues.
 *   `generated_completions.zsh`: **(Generated)** Contains `compdef` lines created by
     `generate_completions.sh`. Do not edit directly.
 *   `generated_rc_sourcing.zsh`: **(Generated)** Contains the `source` commands
     executed by `.zshrc`. Do not edit directly.
+
+## Important Notes
+
+* The module loading order is important! `direnv.zsh` is loaded before `antigen.zsh` (which loads Powerlevel10k) 
+  to prevent prompt warnings.
+* Powerlevel10k is configured for a minimal, clean prompt with transient prompt enabled.
+* Use the `venv` alias to activate Python virtual environments without triggering warnings.
 
 ## Additional Documentation
 

@@ -25,6 +25,8 @@ local preferred_order=(
   aliases.zsh
   direnv.zsh
   antigen.zsh
+  completions.zsh
+  p10k_loader.zsh
   # Add other specific files here if needed, e.g.:
   # fzf.zsh
 )
