@@ -1,0 +1,20 @@
+# Generated files
+generated_*.zsh
+*.zwc
+
+# Potential sensitive information
+secrets.zsh
+*_token.zsh
+*_key.zsh
+*_api.zsh
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db 
