@@ -25,13 +25,11 @@ echo "" >> "$temporary_file"
 # --- Process Aliases ---
 echo "# Completions for Aliases" >> "$temporary_file"
 if [[ -f "$alias_file" ]]; then
-    # Handle standard aliases without conditionals
-    grep -E "^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+=" "$alias_file" | 
-    grep -v "if command" | # Skip conditional blocks
-    while IFS= read -r line; do
-        # Extract alias name
-        local alias_name=$(echo "$line" | sed -E 's/^\s*alias\s+([a-zA-Z0-9_-]+)=.*/\1/')
-        
+    # Extract only alias names without their definitions
+    grep -o -E "^[[:space:]]*alias[[:space:]]+[a-zA-Z0-9_-]+" "$alias_file" | 
+    sed -E 's/^[[:space:]]*alias[[:space:]]+//' |
+    sort -u |  # Sort and remove duplicates
+    while IFS= read -r alias_name; do
         # Map completions based on the alias name
         case "$alias_name" in
             # VIM-related
@@ -81,15 +79,14 @@ fi
 echo "" >> "$temporary_file"
 echo "# Completions for Functions" >> "$temporary_file"
 if [[ -f "$func_file" ]]; then
-    # Extract function names (simple patterns: name() { or function name {)
-    grep -E '^[a-zA-Z0-9_-]+\(\)\s*\{|^\s*function\s+[a-zA-Z0-9_-]+\s*\{' "$func_file" |
-    sed -E 's/^\s*function\s+//; s/\(\)\s*\{//; s/\s*\{//' |
+    # Extract function names and remove the parentheses and braces
+    grep -E '^[a-zA-Z0-9_-]+\(\)|^\s*function\s+[a-zA-Z0-9_-]+' "$func_file" |
+    sed -E 's/^([a-zA-Z0-9_-]+)\(\).*/\1/; s/^\s*function\s+([a-zA-Z0-9_-]+).*/\1/' |
+    sort -u | # Sort and remove duplicates
     while IFS= read -r func_name; do
         if [[ -n "$func_name" ]]; then
-            # Remove trailing () if present
-            local clean_func_name=$(echo "$func_name" | sed 's/()$//')
             # Use _default completion for functions unless specific logic is added
-            echo "compdef _default $clean_func_name" >> "$temporary_file"
+            echo "compdef _default $func_name" >> "$temporary_file"
         fi
     done
 fi
