@@ -26,7 +26,6 @@ antigen bundle git
 antigen bundle brew
 antigen bundle macos
 antigen bundle docker
-antigen bundle dotenv
 
 # Load external plugins - be sure to load these AFTER oh-my-zsh
 antigen bundle zsh-users/zsh-syntax-highlighting

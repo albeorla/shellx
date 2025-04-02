@@ -23,8 +23,8 @@ local preferred_order=(
   generated_completions.zsh
   functions.zsh
   aliases.zsh
-  antigen.zsh
   direnv.zsh
+  antigen.zsh
   # Add other specific files here if needed, e.g.:
   # fzf.zsh
 )

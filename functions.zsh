@@ -124,4 +124,43 @@ shellx_help() {
   else
     echo "\nFunction file not found: ${func_file}" >&2
   fi
+}
+
+# Activate Python virtual environment without triggering Powerlevel10k warnings
+silent_activate() {
+  local venv_path="${1:-".venv"}"
+  
+  # If no argument is provided and .venv exists in current directory, use it
+  if [[ $# -eq 0 && -d ".venv" ]]; then
+    venv_path=".venv"
+  # If no argument is provided and venv exists in current directory, use it
+  elif [[ $# -eq 0 && -d "venv" ]]; then
+    venv_path="venv"
+  fi
+  
+  # Construct the activate script path
+  local activate_script
+  if [[ -f "${venv_path}/bin/activate" ]]; then
+    activate_script="${venv_path}/bin/activate"
+  elif [[ -f "${venv_path}/Scripts/activate" ]]; then
+    # For Windows environments
+    activate_script="${venv_path}/Scripts/activate"
+  else
+    echo "Error: Could not find activate script in ${venv_path}"
+    return 1
+  fi
+  
+  # Temporarily disable P10K instant prompt warnings
+  local old_prompt_setting="${POWERLEVEL9K_INSTANT_PROMPT}"
+  export POWERLEVEL9K_INSTANT_PROMPT=quiet
+  
+  # Source the activate script
+  source "${activate_script}"
+  
+  # Restore the original setting if it existed
+  if [[ -n "${old_prompt_setting}" ]]; then
+    export POWERLEVEL9K_INSTANT_PROMPT="${old_prompt_setting}"
+  else
+    unset POWERLEVEL9K_INSTANT_PROMPT
+  fi
 } 
